@@ -139,11 +139,11 @@ public:
         return value;
     }
 
-    iterator begin() const
+    iterator begin() // this and end() should be const, but because we don't have a const iterator, these have to be non-const
     {
         return iterator{data};
     }
-    iterator end() const
+    iterator end()
     {
         return iterator{&data[size]};
     }
