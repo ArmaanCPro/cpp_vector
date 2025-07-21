@@ -71,7 +71,7 @@ public:
     Vec& operator=(const Vec<T, Alloc>& other) noexcept
     {
         if (*this == other)
-            return;
+            return *this;
 
         auto allocator = Alloc{};
 
