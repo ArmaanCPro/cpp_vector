@@ -37,14 +37,17 @@ private:
     private:
         T* m_ptr = nullptr;
     };
+
 public:
     Vec() = default;
+
     Vec(uint32_t num_elements)
         :
         size(num_elements)
     {
        resize(size);
     }
+
     Vec(std::initializer_list<T> list)
         :
         size(list.size())
@@ -67,7 +70,20 @@ public:
 
     Vec& operator=(const Vec<T, Alloc>& other) noexcept
     {
+        if (*this == other)
+            return;
+
         auto allocator = Alloc{};
+
+        if (data)
+        {
+            // could have a smarter way, instead of deallocating we could use previously allocated memory if it exists and expand/decrease as needed
+            for (int i = 0; i < size; i++)
+            {
+                 std::allocator_traits<Alloc>::destroy(allocator, &data[i]);
+            }
+            std::allocator_traits<Alloc>::deallocate(allocator, data, capacity);
+        }
         std::allocator_traits<Alloc>::allocate(allocator, data, other.capacity);
         size = other.size;
         capacity = other.capacity;
@@ -76,11 +92,16 @@ public:
         {
             data[i] = other[i];
         }
+        return *this;
     }
 
     ~Vec()
     {
         auto allocator = Alloc{};
+        for (int i = 0; i < size; i++)
+        {
+            std::allocator_traits<Alloc>::destroy(allocator, &data[i]);
+        }
         std::allocator_traits<Alloc>::deallocate(allocator, data, capacity);
     }
 
